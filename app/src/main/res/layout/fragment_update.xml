@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.update.UpdateFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+    <ImageView
+        android:layout_marginTop="-1dp"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/icon_update_backgroud" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="27dp"
+        android:layout_marginTop="66dp"
+        android:layout_marginRight="27dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/bn_manual"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/shape_update_bn"
+            android:text="手动升级"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/bn_auto"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="23dp"
+            android:background="@drawable/shape_update_bn"
+            android:text="自动升级"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</LinearLayout>

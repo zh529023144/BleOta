@@ -47,7 +47,7 @@ class UpdateFragment : BaseFragment<UpdatePresenter>(), IUpdateView {
             if (!isEnabled) { //蓝牙未开启 直接开启   开启后  等待usb 指令连接蓝牙
                 val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                 startActivityForResult(enableBtIntent, 100)
-            }else{
+            } else {
                 startActivityForResult(Intent(activity, CaptureActivity::class.java), 300)
             }
 
@@ -165,10 +165,14 @@ class UpdateFragment : BaseFragment<UpdatePresenter>(), IUpdateView {
         val status = response.result.status
         UrlConstant.blueToothId = response.result.blueToothId
         UrlConstant.deviceId = response.result.devId
+        UrlConstant.model = response.result.model
+        UrlConstant.hasPwd = response.result.hasPwd
+        UrlConstant.cellNum = response.result.cellNum
+        UrlConstant.charge = response.result.charge
         var type = "Y"
         when (status) {
             0 -> //未升级
-                mPresenter.getVersionConfig()   //能够升级 获取升级相关信息
+                mPresenter.getVersionConfig(UrlConstant.model)   //能够升级 获取升级相关信息
             1 -> //已升级
             {
                 type = "设备已升级"
@@ -194,11 +198,13 @@ class UpdateFragment : BaseFragment<UpdatePresenter>(), IUpdateView {
     override fun onGetIsHasDevDevError(error: String, errorCode: Int) {
         Log.e(TAG, "onGetDevError  $error")
         //手动升级的  都不可以升级
-        if (errorCode == 501) {
-            showToast("当前设备不可手动升级,请选择自动升级")
-        } else {
-            showToast(error)
-        }
+
+        showToast(error)
+//        if (errorCode == 501) {
+//            showToast("当前设备不可手动升级")
+//        } else {
+//            showToast(error)
+//        }
 
     }
 
@@ -206,7 +212,7 @@ class UpdateFragment : BaseFragment<UpdatePresenter>(), IUpdateView {
         //拿到配置文件
 
         val fileUrl = response.result.installPackage
-        Log.e(TAG, "即将升级的版本  ${response.result.version}")
+        Log.e(TAG, "即将升级的版本  ${response.result.version}  型号：${response.result.model}")
 
         val intent = Intent(activity, OtaActivity2::class.java)
         intent.putExtra("name", UrlConstant.deviceId)
@@ -218,5 +224,6 @@ class UpdateFragment : BaseFragment<UpdatePresenter>(), IUpdateView {
 
     override fun onGetUpdateConfigError(error: String, errorCode: Int) {
         Log.e(TAG, "onGetUpdateConfigError  $error")
+        showToast(error)
     }
 }

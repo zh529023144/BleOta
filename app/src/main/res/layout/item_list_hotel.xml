@@ -30,9 +30,18 @@
 
             <TextView
                 android:id="@+id/tv_hotelName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="七天酒店" />
+
+            <ImageView
+                android:id="@+id/iv_hotel_detail"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/icon_list_detail" />
         </LinearLayout>
 
         <LinearLayout
@@ -76,6 +85,7 @@
                 android:layout_weight="1"
                 android:text="已升级设备数：jianbo" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -10,11 +10,11 @@ class StatisticPresenter : BasePresenter<IStatisticView>() {
     }
 
     //酒店列表
-    fun getBindHotel(hotelName: String?, lastPartner:String?,pageNumber: Int, pageSize: Int) {
+    fun getBindHotel(hotelName: String?, lastPartner: String?, pageNumber: Int, pageSize: Int) {
         checkVIewAttached()
 
         val disposable =
-            mModel.getBindHotel(hotelName, lastPartner,pageNumber, pageSize)
+            mModel.getBindHotel(hotelName, lastPartner, pageNumber, pageSize)
                 .subscribe({
                     if (it.code == 200) {
                         mView.onGetBindHotelSucceed(it)
@@ -62,6 +62,38 @@ class StatisticPresenter : BasePresenter<IStatisticView>() {
                 }, {
                     mView.dismissLoading()
                     mView.onGetUnbindHotelError(
+                        ExceptionHandle.handleException(it),
+                        ExceptionHandle.errorCode
+
+                    )
+                }, {
+                    mView.dismissLoading()
+                })
+
+        addDisposable(disposable)
+    }
+
+    //列表酒店设备详情
+    fun getHotelModelDetail(hotelId: String?) {
+        checkVIewAttached()
+        mView.showLoading()
+        val disposable =
+            mModel.getHotelModelDetail(hotelId = hotelId)
+                .subscribe({
+                    if (it.code == 200) {
+                        mView.onGetHotelModelDetailSucceed(it)
+                    } else {
+                        mView.onGetHotelModelDetailError(
+                            it.message,
+                            it.code
+
+                        )
+                    }
+
+
+                }, {
+                    mView.dismissLoading()
+                    mView.onGetHotelModelDetailError(
                         ExceptionHandle.handleException(it),
                         ExceptionHandle.errorCode
 

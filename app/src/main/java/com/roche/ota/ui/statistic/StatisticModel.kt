@@ -2,6 +2,7 @@ package com.roche.ota.ui.statistic
 
 import com.roche.ota.base.BaseModel
 import com.roche.ota.model.response.BindHotelResponse
+import com.roche.ota.model.response.HotelModelResponse
 import com.roche.ota.model.response.UnbindHotelResponse
 import io.reactivex.Observable
 
@@ -19,6 +20,11 @@ class StatisticModel : BaseModel(){
 
     fun getUnbindHotel():Observable<UnbindHotelResponse>{
         return RetrofitManager.service.getUnbindHotel()
+            .compose(SchedulerUtils.ioToMain())
+    }
+
+    fun getHotelModelDetail(hotelId: String?):Observable<HotelModelResponse>{
+        return RetrofitManager.service.getHotelModelDetail(hotelId)
             .compose(SchedulerUtils.ioToMain())
     }
 }

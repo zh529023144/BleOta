@@ -3,6 +3,7 @@ package com.roche.ota.ui.statistic
 import com.roche.ota.base.IBaseView
 import com.roche.ota.model.response.BindHotelResponse
 import com.roche.ota.model.response.HotelListResponse
+import com.roche.ota.model.response.HotelModelResponse
 import com.roche.ota.model.response.UnbindHotelResponse
 
 interface IStatisticView : IBaseView {
@@ -15,4 +16,9 @@ interface IStatisticView : IBaseView {
     fun onGetUnbindHotelSucceed(response: UnbindHotelResponse)
 
     fun onGetUnbindHotelError(error: String, errorCode: Int)
+
+    //列表酒店设备详情
+
+    fun onGetHotelModelDetailSucceed(response: HotelModelResponse)
+    fun onGetHotelModelDetailError(error: String, errorCode: Int)
 }

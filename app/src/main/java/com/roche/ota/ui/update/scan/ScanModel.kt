@@ -16,8 +16,8 @@ class ScanModel : BaseModel(){
 //    }
 
     //获取版本升级配置
-    fun getUpdateConfig(): Observable<BleUpdateConfigResponse> {
-        return RetrofitManager.service.getUpdateConfig()
+    fun getUpdateConfig(model: String): Observable<BleUpdateConfigResponse> {
+        return RetrofitManager.service.getUpdateConfig(model)
             .compose(SchedulerUtils.ioToMain())
     }
 

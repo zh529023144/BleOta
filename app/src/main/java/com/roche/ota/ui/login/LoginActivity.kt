@@ -8,6 +8,8 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.WindowManager
+import com.lxj.xpopup.XPopup
+import com.lxj.xpopup.enums.PopupPosition
 import com.roche.ota.R
 import com.roche.ota.base.BaseActivity
 import com.roche.ota.model.response.BaseResponse
@@ -15,6 +17,7 @@ import com.roche.ota.model.response.LoginResponse
 import com.roche.ota.ui.MainActivity
 import com.roche.ota.utils.Preference
 import com.roche.ota.utils.showToast
+import com.roche.ota.view.CustomDrawerPopupView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -94,6 +97,11 @@ class LoginActivity : BaseActivity<LoginPresenter>(), ILoginView {
                     passWord = pass
 
                     mPresenter.login(name, pass)
+
+//                     XPopup.Builder(this)
+//                        .hasStatusBarShadow(true)
+//                        .asCustom(CustomDrawerPopupView(this))
+//                        .show()
                 }
             }
 

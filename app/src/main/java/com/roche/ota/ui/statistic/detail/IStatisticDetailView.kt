@@ -11,4 +11,6 @@ interface IStatisticDetailView : IBaseView {
     fun onGetHotelDetailSucceed(response: HotelDetailResponse)
 
     fun onGetHotelDetailError(error: String, errorCode: Int)
+
+
 }

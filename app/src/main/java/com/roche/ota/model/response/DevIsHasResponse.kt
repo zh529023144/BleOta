@@ -9,6 +9,7 @@ data class DevIsHasResponse(
 )
 
 data class DevIsHasResult(
+    val model: String,
     val blueToothId: String,
     val btVersion: String,
     val devId: String,
@@ -23,5 +24,16 @@ data class DevIsHasResult(
     val status: Int,
     val sureUpgradeDevCount: Int,
     val totalDevCount: Int,
-    val upgradeDevCount: Int
+    val upgradeDevCount: Int,
+
+
+    val hasPwd:Int,
+    val weigh:Int,
+    val electricityType:Int,
+    val connectBluetooth:Int,
+    val charge:Int,
+    val connectNetwork:Int,
+    val cellNum:Int
+
+
 )

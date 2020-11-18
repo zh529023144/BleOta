@@ -24,6 +24,18 @@ import java.util.concurrent.TimeUnit
 
 
 class OtaActivity : BaseActivity<OtaPresenter>(), IOtaView, BleManager.BleManagerListener {
+    override fun onGetFeaturesCodeSucceed(response: BaseResponse) {
+    }
+
+    override fun onGetFeaturesCodeError(error: String, errorCode: Int) {
+    }
+
+    override fun onGetSynKeySucceed(response: BaseResponse) {
+    }
+
+    override fun onGetSynKeyError(error: String, errorCode: Int) {
+    }
+
     override fun onUpdateVersionSucceed(response: BaseResponse) {
     }
 
@@ -428,30 +440,30 @@ class OtaActivity : BaseActivity<OtaPresenter>(), IOtaView, BleManager.BleManage
     }
 
 
-    //蓝牙解锁
-
-    override fun onBleUnlockSucceed(response: OldKeyResponse) {
-        val devKey = HexUtil.decodeHex(response.result.oldKey) // 密钥
-        Log.e(TAG, "密钥：$devKey")
-
-//        //给蓝牙发密码指令
-        Log.e(TAG, "蓝牙开始同步")
-        BleManager.instance.write(devKey)
-    }
-
-    override fun onBleUnlockError(error: String, errorCode: Int) {
-        Log.e(TAG, "蓝牙解锁接口异常：$error")
-        showToast(error)
-        BleManager.instance.stopBle()
-        val request = UpdateRequest(
-            UrlConstant.bleMac,
-            UrlConstant.upDateBleVersion,
-            UrlConstant.bleVersion,
-            0, "蓝牙解锁接口异常$error"
-        )
-
-        mPresenter.upDateLog(request)
-    }
+//    //蓝牙解锁
+//
+//    override fun onBleUnlockSucceed(response: OldKeyResponse) {
+//        val devKey = HexUtil.decodeHex(response.result.oldKey) // 密钥
+//        Log.e(TAG, "密钥：$devKey")
+//
+////        //给蓝牙发密码指令
+//        Log.e(TAG, "蓝牙开始同步")
+//        BleManager.instance.write(devKey)
+//    }
+//
+//    override fun onBleUnlockError(error: String, errorCode: Int) {
+//        Log.e(TAG, "蓝牙解锁接口异常：$error")
+//        showToast(error)
+//        BleManager.instance.stopBle()
+//        val request = UpdateRequest(
+//            UrlConstant.bleMac,
+//            UrlConstant.upDateBleVersion,
+//            UrlConstant.bleVersion,
+//            0, "蓝牙解锁接口异常$error"
+//        )
+//
+//        mPresenter.upDateLog(request)
+//    }
 
 
     //OTA 升级

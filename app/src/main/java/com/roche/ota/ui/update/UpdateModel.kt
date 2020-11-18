@@ -14,8 +14,8 @@ class UpdateModel : BaseModel(){
     }
 
     //获取密钥
-    fun getSynKey(devId: String,bTCode: String): Observable<BaseResponse>{
-        return RetrofitManager.service.getSynKey(devId,bTCode,false)
+    fun getSynKey(btRet: String,devId: String,bTCode: String): Observable<BaseResponse>{
+        return RetrofitManager.service.getSynKey(btRet,devId,bTCode,false)
             .compose(SchedulerUtils.ioToMain())
     }
 
@@ -63,10 +63,10 @@ class UpdateModel : BaseModel(){
     }
 
     //密码设备同步
-    fun getFeaturesCode(code: String): Observable<BaseResponse>{
-        return RetrofitManager.service.getFeaturesCode(code)
-            .compose(SchedulerUtils.ioToMain())
-    }
+//    fun getFeaturesCode(code: String): Observable<BaseResponse>{
+//        return RetrofitManager.service.getFeaturesCode(code)
+//            .compose(SchedulerUtils.ioToMain())
+//    }
 
     //获取设备信息
     fun getDev(code: String): Observable<DevConfigResponse>{
@@ -81,8 +81,8 @@ class UpdateModel : BaseModel(){
 //    }
 
     //获取版本升级配置
-    fun getUpdateConfig():Observable<BleUpdateConfigResponse>{
-        return RetrofitManager.service.getUpdateConfig()
+    fun getUpdateConfig(model: String):Observable<BleUpdateConfigResponse>{
+        return RetrofitManager.service.getUpdateConfig(model)
             .compose(SchedulerUtils.ioToMain())
     }
 

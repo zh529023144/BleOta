@@ -133,7 +133,7 @@ class ScanActivity2 : BaseActivity<ScanPresenter>(), IScanView {
     }
 
     override fun initData() {
-        mPresenter.getVersionConfig()//获取升级版本号
+//        mPresenter.getVersionConfig(UrlConstant.model)//获取升级版本号
 
 
         //初始化蓝牙
@@ -167,7 +167,7 @@ class ScanActivity2 : BaseActivity<ScanPresenter>(), IScanView {
         mBleScanHelper.setOnScanListener(object : BleScanHelper.onScanListener {
             override fun onNext(device: BleDevice) {
 
-                if (device.rssi > -60) {
+                if (device.rssi > -80) {
                     mList.add(device)
                     scanBleAdapter.setNewData(mList.distinctBy {
                         it.device.address
@@ -203,10 +203,10 @@ class ScanActivity2 : BaseActivity<ScanPresenter>(), IScanView {
             // -1,0, 0, -126, 0, 0, 0, 1, 52,
             System.arraycopy(bytes9, 1, bytes2, 0, 2) //设备版本号
             System.arraycopy(bytes9, 3, bytes6, 0, 6)//mac 地址
-            if (HexUtil.encodeHexStr(bytes2) == newVersion) {
-                Log.e(TAG, "----当前设备已经是最新版本-----")
-                return
-            }
+//            if (HexUtil.encodeHexStr(bytes2) == newVersion) {
+//                Log.e(TAG, "----当前设备已经是最新版本-----")
+//                return
+//            }
             Log.e(
                 TAG, "蓝牙名称：${scanResult.scanRecord?.deviceName}   " +
                         "蓝牙mac地址：${bleDevice.address}   " +
@@ -216,24 +216,24 @@ class ScanActivity2 : BaseActivity<ScanPresenter>(), IScanView {
 
 
             if (scanResult.scanRecord?.deviceName == HexUtil.encodeHexStr(bytes6, false)) {
-                val fileVersion =
-                    String.format("%02X", bytesTo[5]) + String.format("%02X", bytesTo[4])
+//                val fileVersion =
+//                    String.format("%02X", bytesTo[5]) + String.format("%02X", bytesTo[4])
 
                 //判断版本号 1，是否在升级的列表当中 2，是否跟文件版本号相同
-                devList.forEach {
-                    if (HexUtil.encodeHexStr(bytes2) == it) {
-                        if (fileVersion != HexUtil.encodeHexStr(bytes2)) {
-                            Log.e(TAG, "--------我找到对象啦---------fileVersion $fileVersion")
-
-
-                            UrlConstant.blueToothId = HexUtil.encodeHexStr(bytes6, false)
-
-                            mPresenter.getIsHasDev(null, UrlConstant.blueToothId)
-                        } else {
-                            Log.e(TAG, "--------升级文件版本跟设备版本一致---------")
-                        }
-                    }
-                }
+//                devList.forEach {
+//                    if (HexUtil.encodeHexStr(bytes2) == it) {
+//                        if (fileVersion != HexUtil.encodeHexStr(bytes2)) {
+//                            Log.e(TAG, "--------我找到对象啦---------fileVersion $fileVersion")
+//
+//
+                UrlConstant.blueToothId = HexUtil.encodeHexStr(bytes6, false)
+//
+                mPresenter.getIsHasDev(null, UrlConstant.blueToothId)
+//                        } else {
+//                            Log.e(TAG, "--------升级文件版本跟设备版本一致---------")
+//                        }
+//                    }
+//                }
             }
 
         }
@@ -296,34 +296,52 @@ class ScanActivity2 : BaseActivity<ScanPresenter>(), IScanView {
     override fun onGetUpdateConfigSucceed(response: BleUpdateConfigResponse) {
         //获取需要升级版本号  版本号列表 及升级文件
         fileUrl = response.result.installPackage
-        newVersion = response.result.version
-        devList = response.result.versionRange
+//        newVersion = response.result.version
+//        devList = response.result.versionRange
+        Log.e(TAG, "即将升级的版本  ${response.result.version}  型号：${response.result.model}")
 
-        val dis = Observable.create<String> {
-            AppUtils.getUrlDownByte(fileUrl)
-            it.onNext("y")
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
+        val intent = Intent(this, OtaActivity2::class.java)
+        intent.putExtra("name", UrlConstant.blueToothId)
+        intent.putExtra("mac", AppUtils.getStr(UrlConstant.blueToothId))
+        intent.putExtra("fileUrl", fileUrl)
+        intent.putExtra("isUnbind", true)
+        startActivityForResult(intent, 800)
 
-                AppUtils.getFileByte(File(UrlConstant.LOCAL_FILE_UPDATE), bytesTo)
-
-                Log.e(TAG, "bytesTo：${HexUtil.encodeHexStr(bytesTo)}")
-            }, {
-
-            })
+//        val dis = Observable.create<String> {
+//            AppUtils.getUrlDownByte(fileUrl)
+//            it.onNext("y")
+//        }
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe({
+//
+//                AppUtils.getFileByte(File(UrlConstant.LOCAL_FILE_UPDATE), bytesTo)
+//
+//                Log.e(TAG, "bytesTo：${HexUtil.encodeHexStr(bytesTo)}")
+//            }, {
+//
+//            })
 
 
     }
 
     override fun onGetUpdateConfigError(error: String, errorCode: Int) {
         Log.e(TAG, "onGetUpdateConfigError：$error")
+        mBleScanHelper.stopScanBle()
+        isScan = false
+        bn_scan.text = "开始扫描"
+        dismissLoading()
+        showToast(error)
     }
 
     override fun onGetIsHasDevSucceed(response: DevIsHasResponse) {
         //可操作
         val status = response.result.status
+        UrlConstant.deviceId = response.result.devId
+        UrlConstant.model = response.result.model
+        UrlConstant.hasPwd = response.result.hasPwd
+        UrlConstant.cellNum = response.result.cellNum
+        UrlConstant.charge = response.result.charge
         when (status) {
             0 -> //未升级
             {
@@ -332,19 +350,20 @@ class ScanActivity2 : BaseActivity<ScanPresenter>(), IScanView {
                 bn_scan.text = "开始扫描"
                 dismissLoading()
 
+                mPresenter.getVersionConfig(UrlConstant.model)//获取升级版本号
 
-                val intent = Intent(this, OtaActivity2::class.java)
-                intent.putExtra("name", UrlConstant.blueToothId)
-                intent.putExtra("mac", AppUtils.getStr(UrlConstant.blueToothId))
-                intent.putExtra("fileUrl", fileUrl)
-                intent.putExtra("isUnbind", true)
-                startActivityForResult(intent, 800)
+//                val intent = Intent(this, OtaActivity2::class.java)
+//                intent.putExtra("name", UrlConstant.blueToothId)
+//                intent.putExtra("mac", AppUtils.getStr(UrlConstant.blueToothId))
+//                intent.putExtra("fileUrl", fileUrl)
+//                intent.putExtra("isUnbind", true)
+//                startActivityForResult(intent, 800)
             }
 
             1 -> //已升级
-                showToast("设备已升级")
+                Log.e(TAG, "设备已升级")
             2 -> //不可升级
-                showToast("设备不可升级")
+                Log.e(TAG, "设备不可升级")
         }
 
 
@@ -353,20 +372,19 @@ class ScanActivity2 : BaseActivity<ScanPresenter>(), IScanView {
     override fun onGetIsHasDevDevError(error: String, errorCode: Int) {
         Log.e(TAG, "error：$error")
 //区分一种特殊情况  自动升级的可以  未入库 有权限的 直接升级
-        if (errorCode == 501) {
-            mBleScanHelper.stopScanBle()
-            isScan = false
-            bn_scan.text = "开始扫描"
-            dismissLoading()
+//        if (errorCode == 501) {
+//            mBleScanHelper.stopScanBle()
+//            isScan = false
+//            bn_scan.text = "开始扫描"
+//            dismissLoading()
 
-            val intent = Intent(this, OtaActivity2::class.java)
-            intent.putExtra("name", UrlConstant.blueToothId)
-            intent.putExtra("mac", AppUtils.getStr(UrlConstant.blueToothId))
-            intent.putExtra("fileUrl", fileUrl)
-            intent.putExtra("isUnbind", false)
-            startActivityForResult(intent, 800)
-        }
-
+//            val intent = Intent(this, OtaActivity2::class.java)
+//            intent.putExtra("name", UrlConstant.blueToothId)
+//            intent.putExtra("mac", AppUtils.getStr(UrlConstant.blueToothId))
+//            intent.putExtra("fileUrl", fileUrl)
+//            intent.putExtra("isUnbind", false)
+//            startActivityForResult(intent, 800)
+//        }
 
     }
 }

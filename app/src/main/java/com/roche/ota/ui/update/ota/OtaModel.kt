@@ -13,12 +13,12 @@ class OtaModel : BaseModel(){
             .compose(SchedulerUtils.ioToMain())
     }
 
-    //蓝牙解锁
-
-    fun getBleUnlock(devId: String): Observable<OldKeyResponse> {
-        return RetrofitManager.service.getDevkey(false,devId)
-            .compose(SchedulerUtils.ioToMain())
-    }
+//    //蓝牙解锁
+//
+//    fun getBleUnlock(devId: String): Observable<OldKeyResponse> {
+//        return RetrofitManager.service.getDevkey(false,devId)
+//            .compose(SchedulerUtils.ioToMain())
+//    }
 
     //判断设备是否已经入库
     fun isDevPut(devId: String): Observable<IsDevPutResponse>{
@@ -35,6 +35,18 @@ class OtaModel : BaseModel(){
     //更新蓝牙版本接口
     fun upDateVersion(devId: String?,blueToothId:String?,btCode:String):Observable<BaseResponse>{
         return RetrofitManager.service.getUpdateBleVersion(devId,blueToothId,btCode)
+            .compose(SchedulerUtils.ioToMain())
+    }
+
+    //获取密钥
+    fun getSynKey(btRet: String?,devId: String?,bTCode: String): Observable<BaseResponse>{
+        return RetrofitManager.service.getSynKey(btRet,devId,bTCode,false)
+            .compose(SchedulerUtils.ioToMain())
+    }
+
+    //密码设备同步
+    fun getFeaturesCode(btRet: String,code: String): Observable<BaseResponse>{
+        return RetrofitManager.service.getFeaturesCode(btRet,code)
             .compose(SchedulerUtils.ioToMain())
     }
 }

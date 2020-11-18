@@ -8,7 +8,7 @@ import java.util.*
  *
  */
 object UrlConstant {
-//    const val BASE_URL = "http://192.168.0.130:8083/"
+//    const val BASE_URL = "http://192.168.0.142:8083/"
     const val BASE_URL = "https://test.nofetel.com/"
 //    const val BASE_URL = "https://1.nofetel.com/"
 

@@ -40,16 +40,16 @@ class OtaPresenter : BasePresenter<IOtaView>(){
         addDisposable(disposable)
     }
 
-    //蓝牙解锁
-    fun getBleUnlock(devId: String) {
+    //获取密钥
+    fun getSynKey(btRet: String?,devId: String,bTCode: String) {
         checkVIewAttached()
-
-        val disposable = mOtaModel.getBleUnlock(devId)
+        mView.showLoading()
+        val disposable = mOtaModel.getSynKey(btRet,devId, bTCode)
             .subscribe({
                 if (it.code == 200) {
-                    mView.onBleUnlockSucceed(it)
+                    mView.onGetSynKeySucceed(it)
                 } else {
-                    mView.onBleUnlockError(
+                    mView.onGetSynKeyError(
                         it.message,
                         it.code
 
@@ -58,7 +58,7 @@ class OtaPresenter : BasePresenter<IOtaView>(){
 
             }, {
                 mView.dismissLoading()
-                mView.onBleUnlockError(
+                mView.onGetSynKeyError(
                     ExceptionHandle.handleException(it),
                     ExceptionHandle.errorCode
 
@@ -69,6 +69,36 @@ class OtaPresenter : BasePresenter<IOtaView>(){
 
         addDisposable(disposable)
     }
+
+//    //蓝牙解锁
+//    fun getBleUnlock(devId: String) {
+//        checkVIewAttached()
+//
+//        val disposable = mOtaModel.getBleUnlock(devId)
+//            .subscribe({
+//                if (it.code == 200) {
+//                    mView.onBleUnlockSucceed(it)
+//                } else {
+//                    mView.onBleUnlockError(
+//                        it.message,
+//                        it.code
+//
+//                    )
+//                }
+//
+//            }, {
+//                mView.dismissLoading()
+//                mView.onBleUnlockError(
+//                    ExceptionHandle.handleException(it),
+//                    ExceptionHandle.errorCode
+//
+//                )
+//            }, {
+//                mView.dismissLoading()
+//            })
+//
+//        addDisposable(disposable)
+//    }
 
 //    //判断设备是否已经入库
 //    fun isDevPut(devId: String) {
@@ -150,6 +180,37 @@ class OtaPresenter : BasePresenter<IOtaView>(){
             }, {
                 mView.dismissLoading()
                 mView.onUpdateVersionError(
+                    ExceptionHandle.handleException(it),
+                    ExceptionHandle.errorCode
+
+                )
+            }, {
+                mView.dismissLoading()
+            })
+
+        addDisposable(disposable)
+    }
+
+    //密码设备入库
+    fun getFeaturesCode(btRet: String,devId: String) {
+        checkVIewAttached()
+
+        val disposable = mOtaModel.getFeaturesCode(btRet,devId)
+            .subscribe({
+                if (it.code == 200) {
+                    mView.onGetFeaturesCodeSucceed(it)
+                } else {
+                    mView.onGetFeaturesCodeError(
+                        it.message,
+                        it.code
+
+                    )
+                }
+
+
+            }, {
+                mView.dismissLoading()
+                mView.onGetFeaturesCodeError(
                     ExceptionHandle.handleException(it),
                     ExceptionHandle.errorCode
 

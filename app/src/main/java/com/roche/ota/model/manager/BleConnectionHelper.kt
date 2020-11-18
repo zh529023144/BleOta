@@ -95,7 +95,12 @@ class BleConnectionHelper private constructor(context: Context) {
             //连接设备
             mHandler.post {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mBluetoothGatt = mBluetoothDevice.connectGatt(mContext, false, mGattCallback, BluetoothDevice.TRANSPORT_LE)
+                    mBluetoothGatt = mBluetoothDevice.connectGatt(
+                        mContext,
+                        false,
+                        mGattCallback,
+                        BluetoothDevice.TRANSPORT_LE
+                    )
                 } else {
                     mBluetoothGatt = mBluetoothDevice.connectGatt(mContext, false, mGattCallback)
                 }
@@ -262,6 +267,7 @@ class BleConnectionHelper private constructor(context: Context) {
      */
     fun tryReConnection() {
         Log.e(TAG, "尝试重连  $retryCount")
+        showToast("蓝牙连接异常,正在尝试重连")
         retryCount++
         //之前尝试连接不成功，先关闭之前的连接
         closeConnection()
@@ -319,7 +325,7 @@ class BleConnectionHelper private constructor(context: Context) {
             }
             else -> {
                 //遇到特殊情况尝试重连，增加连接成功率
-                if (retryCount < 5 && !isConnected) {
+                if (retryCount < 1 && !isConnected) {
                     //尝试重连
                     tryReConnection()
 

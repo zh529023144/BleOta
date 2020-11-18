@@ -9,10 +9,10 @@ class ScanPresenter : BasePresenter<IScanView>(){
         ScanModel()
     }
 
-    fun getVersionConfig(){
+    fun getVersionConfig(model: String){
         checkVIewAttached()
 
-        val disposable = mModel.getUpdateConfig()
+        val disposable = mModel.getUpdateConfig(model)
             .subscribe({
                 if (it.code == 200) {
                     mView.onGetUpdateConfigSucceed(it)

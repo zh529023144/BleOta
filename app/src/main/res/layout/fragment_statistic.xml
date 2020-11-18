@@ -110,6 +110,13 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="6dp"
                 android:src="@drawable/icon_device_bind" />
+            <ImageView
+                android:id="@+id/iv_hotel_detail"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/icon_list_detail" />
         </LinearLayout>
 
 

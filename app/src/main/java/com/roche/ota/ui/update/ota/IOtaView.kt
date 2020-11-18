@@ -8,10 +8,13 @@ interface IOtaView : IBaseView {
     fun onBleKeySucceed(response: BleCodeResponse)
     fun onBleKeyError(error: String, errorCode: Int)
 
-    //蓝牙解锁
-    fun onBleUnlockSucceed(response: OldKeyResponse)
-
-    fun onBleUnlockError(error: String, errorCode: Int)
+    //获取密钥
+    fun onGetSynKeySucceed(response: BaseResponse)
+    fun onGetSynKeyError(error: String, errorCode: Int)
+//    //蓝牙解锁
+//    fun onBleUnlockSucceed(response: OldKeyResponse)
+//
+//    fun onBleUnlockError(error: String, errorCode: Int)
 
 //    //判断设备是否已经入库
 //    fun onIsDevPutSucceed(response: IsDevPutResponse)
@@ -25,5 +28,9 @@ interface IOtaView : IBaseView {
     //更新最新版本
     fun onUpdateVersionSucceed(response: BaseResponse)
     fun onUpdateVersionError(error: String, errorCode: Int)
+
+    //密码设备同步
+    fun onGetFeaturesCodeSucceed(response: BaseResponse)
+    fun onGetFeaturesCodeError(error: String, errorCode: Int)
 
 }

@@ -27,6 +27,7 @@ import com.flyco.tablayout.listener.OnTabSelectListener
 import com.kingja.loadsir.core.LoadService
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.core.BasePopupView
+import com.lxj.xpopup.enums.PopupPosition
 import com.lxj.xpopup.interfaces.SimpleCallback
 import com.lxj.xpopup.interfaces.XPopupCallback
 import com.roche.ota.R
@@ -39,6 +40,7 @@ import com.roche.ota.ui.statistic.child.StatisticChildFragment
 import com.roche.ota.ui.statistic.detail.StatisticDetailActivity
 import com.roche.ota.utils.StatusBarUtil
 import com.roche.ota.utils.showToast
+import com.roche.ota.view.CustomDrawerPopupView
 import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.listener.OnRefreshLoadmoreListener
 import kotlinx.android.synthetic.*
@@ -75,6 +77,8 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
     var mLastPartner: String? = null
 
     lateinit var xPopup: BasePopupView
+
+    lateinit var xPopupDrawer: BasePopupView
 
     var isLoadmore = false
 
@@ -114,6 +118,8 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
                     helper?.setText(R.id.tv_dev_noUpdate, "未升级设备数：" + item?.notUpgradeDevCount)
                     helper?.setText(R.id.tv_dev_update, "已升级设备数：" + item?.upgradeDevCount)
                     helper?.setText(R.id.tv_dev_neverUp, "不可升级设备数：" + item?.prohibitDevCount)
+
+                    helper?.addOnClickListener(R.id.iv_hotel_detail)
                 }
             }
 
@@ -152,6 +158,12 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
 
         }
 
+        mAdapter.setOnItemChildClickListener { adapter, view, position ->
+            //            (xPopupDrawer as CustomDrawerPopupView).setData()
+            val bindHotelResultRecord = adapter.getItem(position) as BindHotelResultRecord
+            mPresenter.getHotelModelDetail(bindHotelResultRecord.hotelId)
+        }
+
         ll_unBind.setOnClickListener {
             val intent = Intent(activity, StatisticDetailActivity::class.java)
             intent.putExtra("type", "unbind")
@@ -167,6 +179,11 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
         iv_hotel_clean.setOnClickListener {
 
             et_search.setText("")
+        }
+
+        iv_hotel_detail.setOnClickListener {
+            mPresenter.getHotelModelDetail(null)
+
         }
 
         et_search.setOnEditorActionListener(object : TextView.OnEditorActionListener {
@@ -226,13 +243,13 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if (p0.toString().trim().isEmpty()) {
-                    iv_hotel_clean.visibility=View.GONE
+                    iv_hotel_clean.visibility = View.GONE
                     hideSoftKeyboard(activity)
                     mSearchHotel = null
                     mLastPartner = null
                     refreshLayout.autoRefresh()
-                }else{
-                    iv_hotel_clean.visibility=View.VISIBLE
+                } else {
+                    iv_hotel_clean.visibility = View.VISIBLE
                 }
             }
 
@@ -243,7 +260,7 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
 
     override fun lazyLoadData() {
         xPopup = XPopup.Builder(context)
-            .setPopupCallback(object : SimpleCallback(){
+            .setPopupCallback(object : SimpleCallback() {
                 override fun beforeDismiss(popupView: BasePopupView?) {
                     iv_list_flag.setImageResource(R.drawable.icon_up_san)
                 }
@@ -267,6 +284,10 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
 
         refreshLayout.autoRefresh()
 //        mPresenter.getBindHotel(mSearchHotel, mLastPartner, pageNumber, pageSize)
+
+        xPopupDrawer = XPopup.Builder(context)
+            .hasStatusBarShadow(true)
+            .asCustom(CustomDrawerPopupView(context!!))
 
     }
 
@@ -342,4 +363,15 @@ class StatisticFragment : BaseFragment<StatisticPresenter>(), IStatisticView {
         showToast(error)
     }
 
+
+    //酒店设备详情
+    override fun onGetHotelModelDetailSucceed(response: HotelModelResponse) {
+        xPopupDrawer.show()
+        (xPopupDrawer as CustomDrawerPopupView).setData(response.result)
+    }
+
+    override fun onGetHotelModelDetailError(error: String, errorCode: Int) {
+        Log.e(TAG, "onGetHotelModelDetailError:$error")
+        showToast(error)
+    }
 }

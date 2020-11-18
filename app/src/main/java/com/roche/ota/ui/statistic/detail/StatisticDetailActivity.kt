@@ -101,7 +101,7 @@ class StatisticDetailActivity : BaseActivity<StatisticDetailPresenter>(), IStati
                         R.id.tv_dev_versions,
                         "版本号：" + item?.initBtCode
                     )
-
+                    helper?.setText(R.id.tv_list_model, "机型："+item?.model)
                     when (item?.status) {
                         0 -> helper?.setText(R.id.tv_dev_update_state, "未升级")
                         1 -> helper?.setText(R.id.tv_dev_update_state, "已升级")

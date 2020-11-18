@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
+import android.content.Intent
 import android.graphics.Color
 import android.util.Log
 import android.view.KeyEvent
@@ -152,6 +153,7 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
 
 
         try {
+            showLoading()
             bleConnectionHelper.connection(UrlConstant.blueToothId)
         } catch (a: Exception) {
             showToast(a.localizedMessage)
@@ -223,18 +225,18 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
                     "电量通知:" + UrlConstant.version + "\n" + UrlConstant.func + "\n" + UrlConstant.patch
                 )
 
-                if (isUpdate) {
-
-                    isUpdate = false
-                    Log.e(TAG, "----------已升级 最新版本号---${UrlConstant.version}---------")
-
-                    mPresenter.upDateVersion(
-                        UrlConstant.deviceId,
-                        UrlConstant.bleMac,
-                        HexUtil.str2HexStr(UrlConstant.version)
-                    )
-                    return
-                }
+//                if (isUpdate) {
+//
+//                    isUpdate = false
+//                    Log.e(TAG, "----------已升级 最新版本号---${UrlConstant.version}---------")
+//
+//                    mPresenter.upDateVersion(
+//                        UrlConstant.deviceId,
+//                        UrlConstant.bleMac,
+//                        HexUtil.str2HexStr(UrlConstant.version)
+//                    )
+//                    return
+//                }
 
 
                 tv_version.text = UrlConstant.version
@@ -248,7 +250,11 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
 
                 if (isUnbind!!) {
                     Log.e(TAG, "设备存在 需要解锁")
-                    mPresenter.getBleUnlock(UrlConstant.bleMac)
+                    mPresenter.getSynKey(
+                        UrlConstant.bleMac,
+                        UrlConstant.deviceId,
+                        UrlConstant.bTCode
+                    )
                 } else {
                     Log.e(TAG, "设备不存在 不用解锁 直接升级")
                     onDevOta()
@@ -266,14 +272,74 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
 
             }
             "RESET_PAY_CODE" -> {//同步秘钥？重置秘钥
+                when (keyStatus) {
+
+                    "1" -> {
+
+                        showToast("设备同步秘钥成功")
+
+
+
+                        if (isUpdate) {
+                            Log.e(TAG, "升级完成后 蓝牙同步密钥成功")
+                            isUpdate = false
+                            Log.e(TAG, "----------已升级 最新版本号---${UrlConstant.version}---------")
+
+
+                            //支持密码   就需要调一下同步密码的接口
+                            if (UrlConstant.hasPwd == 1) {
+                                mPresenter.getFeaturesCode(UrlConstant.bleMac, UrlConstant.deviceId)
+                            } else {
+                                mPresenter.upDateVersion(
+                                    UrlConstant.deviceId,
+                                    UrlConstant.bleMac,
+                                    HexUtil.str2HexStr(UrlConstant.version)
+                                )
+                            }
+                            return
+                        }
+
+                        Log.e(TAG, "第一次  蓝牙同步密钥成功")
+                        onDevOta()
+                    }
+                    else -> {
+                        showToast("蓝牙同步密钥异常")
+                        bleConnectionHelper.onDestroy()
+                        val request = UpdateRequest(
+                            UrlConstant.bleMac,
+                            UrlConstant.upDateBleVersion,
+                            UrlConstant.bleVersion,
+                            0, "蓝牙解锁指令异常"
+                        )
+
+                        mPresenter.upDateLog(request)
+                    }
+
+                }
+
+
             }
             "RESET_KEYS" -> {//重置密码
                 when (keyStatus) {
                     "1" -> {
                         showToast("设备同步成功")
+                        mPresenter.upDateVersion(
+                            UrlConstant.deviceId,
+                            UrlConstant.bleMac,
+                            HexUtil.str2HexStr(UrlConstant.version)
+                        )
                     }
                     else -> {
                         showToast("设备同步异常")
+                        bleConnectionHelper.onDestroy()
+                        val request = UpdateRequest(
+                            UrlConstant.bleMac,
+                            UrlConstant.upDateBleVersion,
+                            UrlConstant.bleVersion,
+                            0, "设备密码同步异常"
+                        )
+
+                        mPresenter.upDateLog(request)
                     }
                 }
             }
@@ -282,7 +348,7 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
 
                     "1" -> {
                         showToast("蓝牙解锁成功")
-                        onDevOta()
+//                        onDevOta()
                     }
                     else -> {
                         showToast("蓝牙解锁指令异常")
@@ -327,8 +393,35 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
 
     //蓝牙解锁
 
-    override fun onBleUnlockSucceed(response: OldKeyResponse) {
-        val devKey = HexUtil.decodeHex(response.result.oldKey) // 密钥
+//    override fun onBleUnlockSucceed(response: OldKeyResponse) {
+//        val devKey = HexUtil.decodeHex(response.result.oldKey) // 密钥
+//        Log.e(TAG, "密钥：$devKey")
+//
+////        //给蓝牙发密码指令
+//        Log.e(TAG, "蓝牙开始同步")
+//
+//        bleConnectionHelper.writeCharacteristic(
+//            characteristic,
+//            devKey
+//        )
+//    }
+//
+//    override fun onBleUnlockError(error: String, errorCode: Int) {
+//        Log.e(TAG, "蓝牙解锁接口异常：$error")
+//        showToast(error)
+//        bleConnectionHelper.onDestroy()
+//        val request = UpdateRequest(
+//            UrlConstant.bleMac,
+//            UrlConstant.upDateBleVersion,
+//            UrlConstant.bleVersion,
+//            0, "蓝牙解锁接口异常$error"
+//        )
+//
+//        mPresenter.upDateLog(request)
+//    }
+
+    override fun onGetSynKeySucceed(response: BaseResponse) {
+        val devKey = HexUtil.decodeHex(response.result) // 密钥
         Log.e(TAG, "密钥：$devKey")
 
 //        //给蓝牙发密码指令
@@ -338,9 +431,10 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
             characteristic,
             devKey
         )
+
     }
 
-    override fun onBleUnlockError(error: String, errorCode: Int) {
+    override fun onGetSynKeyError(error: String, errorCode: Int) {
         Log.e(TAG, "蓝牙解锁接口异常：$error")
         showToast(error)
         bleConnectionHelper.onDestroy()
@@ -353,7 +447,6 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
 
         mPresenter.upDateLog(request)
     }
-
 
     //OTA 升级
     private fun onDevOta() {
@@ -460,6 +553,23 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
     }
 
 
+    override fun onGetFeaturesCodeSucceed(response: BaseResponse) {
+        val devKey = HexUtil.decodeHex(response.result) // 密钥
+        Log.e(TAG, "密钥：$devKey")
+
+//        //给蓝牙发密码指令
+        Log.e(TAG, "蓝牙密码设备开始同步")
+
+        bleConnectionHelper.writeCharacteristic(
+            characteristic,
+            devKey
+        )
+    }
+
+    override fun onGetFeaturesCodeError(error: String, errorCode: Int) {
+
+    }
+
     /**
      * 连接回调监听
      */
@@ -475,7 +585,9 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
 
         //最后 重连都失败的
         override fun onConnectionFail() {
+            dismissLoading()
             Log.e(TAG, "蓝牙连接失败")
+            showToast("蓝牙连接失败")
             bleConnectionHelper.onDestroy()
             setResult(Activity.RESULT_OK)
             finish()
@@ -579,6 +691,7 @@ class OtaActivity2 : BaseActivity<OtaPresenter>(), IOtaView {
             when (uuid) {
                 UrlConstant.WRITE_UUID.toString() -> {
                     //给到后台接口处理
+                    UrlConstant.bTCode = data
                     Log.e(TAG, "给后台处理的指令：${data}")
                     mPresenter.getBleKey(UrlConstant.deviceId, data)
 

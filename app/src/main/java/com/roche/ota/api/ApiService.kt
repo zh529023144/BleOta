@@ -1,4 +1,5 @@
 package com.roche.ota.api
+
 import com.roche.ota.model.response.*
 import io.reactivex.Observable
 import okhttp3.RequestBody
@@ -38,9 +39,10 @@ interface ApiService {
     //初始化同步密钥
     @GET("VendingSystem/bindingDev/createInitialCode")
     fun getSynKey(
-        @Query("devId") devId: String,
+        @Query("btMac") btMac: String?,
+        @Query("devId") devId: String?,
         @Query("bTCode") bTCode: String,
-        @Query("useOrigin") useOrigin:Boolean
+        @Query("useOrigin") useOrigin: Boolean
     ): Observable<BaseResponse>
 
     //同步后端
@@ -115,9 +117,10 @@ interface ApiService {
     //密码 同步
     @GET("VendingSystem/bindingDev/getFeaturesCode")
     fun getFeaturesCode(
-        @Query("devId") devId: String
-    ): Observable<BaseResponse>
+        @Query("btRet") btRet: String?,
+        @Query("devId") devId: String?
 
+    ): Observable<BaseResponse>
 
 
     //死指令处理
@@ -152,53 +155,62 @@ interface ApiService {
 
     //获取用户信息
     @GET("VendingSystem/user/info")
-    fun getUserData():Observable<UserResponse>
+    fun getUserData(): Observable<UserResponse>
 
     //未绑定酒店的接口
     @GET("VendingSystem/version/unBindHotelList")
     fun getUnbindHotel(
-    ):Observable<UnbindHotelResponse>
+    ): Observable<UnbindHotelResponse>
 
     //酒店列表接口
     @GET("VendingSystem/version/hotelUpgradeList")
     fun getBindHotel(
-        @Query("hotelName") hotelName:String?,
-        @Query("lastPartner") lastPartner:String?,
+        @Query("hotelName") hotelName: String?,
+        @Query("lastPartner") lastPartner: String?,
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int
-    ):Observable<BindHotelResponse>
+    ): Observable<BindHotelResponse>
 
     //列表详情接口
     @GET("VendingSystem/version/hotelDevDetail")
     fun getListDetail(
-        @Query("status") status:String?,
-        @Query("hotelId") hotelId:String?,
-        @Query("roomCode") roomCode:String?,
-        @Query("devId") devId:String?,
-        @Query("blueToothId") blueToothId:String?,
+        @Query("status") status: String?,
+        @Query("hotelId") hotelId: String?,
+        @Query("roomCode") roomCode: String?,
+        @Query("devId") devId: String?,
+        @Query("blueToothId") blueToothId: String?,
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int
-    ):Observable<HotelDetailResponse>
+    ): Observable<HotelDetailResponse>
 
     //蓝牙版本升级文件接口
     @GET("VendingSystem/version/findInstallPackage")
     fun getUpdateConfig(
-    ):Observable<BleUpdateConfigResponse>
+        @Query("model") model: String
+    ): Observable<BleUpdateConfigResponse>
 
     //更新设备版本接口
     @POST("VendingSystem/version/updateDevVersion")
     fun getUpdateBleVersion(
-        @Query("devId") devId:String?,
-        @Query("blueToothId") blueToothId:String?,
-        @Query("initBtCode") initBtCode:String
-    ):Observable<BaseResponse>
+        @Query("devId") devId: String?,
+        @Query("blueToothId") blueToothId: String?,
+        @Query("initBtCode") initBtCode: String
+    ): Observable<BaseResponse>
 
 
     //查询是否可操作
     @GET("VendingSystem/version/checkIsUpgradeDev")
     fun getIsHasDev(
-        @Query("devId") devId:String?,
-        @Query("blueToothId") blueToothId:String?
-    ):Observable<DevIsHasResponse>
+        @Query("devId") devId: String?,
+        @Query("blueToothId") blueToothId: String?
+    ): Observable<DevIsHasResponse>
+
+    //查询该酒店下的机型详情
+
+    @GET("VendingSystem/version/hotelDetail")
+    fun getHotelModelDetail(
+        @Query("hotelId") hotelId: String?
+    ): Observable<HotelModelResponse>
+
 
 }

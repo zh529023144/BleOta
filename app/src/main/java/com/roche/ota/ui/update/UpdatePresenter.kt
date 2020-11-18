@@ -71,10 +71,10 @@ class UpdatePresenter : BasePresenter<IUpdateView>(){
         addDisposable(disposable)
     }
 
-    fun getVersionConfig(){
+    fun getVersionConfig(model: String){
         checkVIewAttached()
 
-        val disposable = mWorkModel.getUpdateConfig()
+        val disposable = mWorkModel.getUpdateConfig(model)
             .subscribe({
                 if (it.code == 200) {
                     mView.onGetUpdateConfigSucceed(it)

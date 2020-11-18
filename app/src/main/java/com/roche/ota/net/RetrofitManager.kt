@@ -49,6 +49,7 @@ object RetrofitManager {
             val originalRequest = chain.request()
             val requestBuilder = originalRequest.newBuilder()
                 // Provide your custom header here
+                .header("user-agent", "android")
                 .header("accessToken", token)
                 .method(originalRequest.method(), originalRequest.body())
             val request = requestBuilder.build()

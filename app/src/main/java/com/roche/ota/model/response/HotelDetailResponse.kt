@@ -29,6 +29,7 @@ data class HotelDetailResultRecord(
     val notUpgradeDevCount: Int,
     val prohibitDevCount: Int,
     val roomCode: String,
+    val model: String,
     val status: Int,
     val sureUpgradeDevCount: Int,
     val totalDevCount: Int,
